@@ -1,0 +1,20 @@
+[Unit]
+Description=Grafana
+After=docker.service graphite.service
+Requires=docker.service graphite.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker kill grafana
+ExecStartPre=-/usr/bin/docker rm -v grafana
+ExecStartPre=/usr/bin/docker pull grafana/grafana
+ExecStart=/usr/bin/docker run \
+    --name grafana \
+    -v /home/ubuntu/screeps/data/grafana:/var/lib/grafana \
+    --env-file /home/ubuntu/screeps/grafana.env \
+    -e "LETSENCRYPT_EMAIL=ry@cgamesplay.com" \
+    -e "LETSENCRYPT_HOST=screeps.cgamesplay.com" \
+    -e "VIRTUAL_HOST=screeps.cgamesplay.com" \
+    --link graphite \
+    grafana/grafana
+ExecStop=/usr/bin/docker stop grafana

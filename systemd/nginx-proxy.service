@@ -1,0 +1,20 @@
+[Unit]
+Description=Nginx-Proxy
+After=docker.service
+Requires=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker kill nginx-proxy
+ExecStartPre=-/usr/bin/docker rm -v nginx-proxy
+ExecStartPre=/usr/bin/docker pull jwilder/nginx-proxy
+ExecStart=/usr/bin/docker run \
+    --name nginx-proxy \
+    -p 80:80 \
+    -p 443:443 \
+    -v /home/ubuntu/screeps/data/certs:/etc/nginx/certs:ro \
+    -v /etc/nginx/vhost.d \
+    -v /usr/share/nginx/html \
+    -v /var/run/docker.sock:/tmp/docker.sock:ro \
+    jwilder/nginx-proxy
+ExecStop=/usr/bin/docker stop nginx-proxy

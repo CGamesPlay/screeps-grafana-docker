@@ -1,0 +1,15 @@
+[Unit]
+Description=Statsd
+After=docker.service graphite.service
+Requires=docker.service graphite.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker kill statsd
+ExecStartPre=-/usr/bin/docker rm -v statsd
+ExecStartPre=/usr/bin/docker pull ennexa/statsd
+ExecStart=/usr/bin/docker run \
+    --name statsd \
+    --link graphite \
+    ennexa/statsd
+ExecStop=/usr/bin/docker stop statsd

@@ -1,0 +1,17 @@
+[Unit]
+Description=Letsencrypt
+After=docker.service nginx-proxy.service
+Requires=docker.service nginx-proxy.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker kill letsencrypt
+ExecStartPre=-/usr/bin/docker rm -v letsencrypt
+ExecStartPre=/usr/bin/docker pull jrcs/letsencrypt-nginx-proxy-companion
+ExecStart=/usr/bin/docker run \
+    --name letsencrypt \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    --volumes-from nginx-proxy \
+    -v /home/ubuntu/screeps/data/certs:/etc/nginx/certs:rw \
+    jrcs/letsencrypt-nginx-proxy-companion
+ExecStop=/usr/bin/docker stop letsencrypt

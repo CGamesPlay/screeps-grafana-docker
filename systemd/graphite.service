@@ -1,0 +1,16 @@
+[Unit]
+Description=Graphite
+After=docker.service
+Requires=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker kill graphite
+ExecStartPre=-/usr/bin/docker rm -v graphite
+ExecStartPre=/usr/bin/docker pull ennexa/graphite
+ExecStart=/usr/bin/docker run \
+    --name graphite \
+    -v /opt/graphite/conf \
+    -v /home/ubuntu/screeps/data/graphite:/opt/graphite/storage/whisper \
+    ennexa/graphite
+ExecStop=/usr/bin/docker stop graphite

@@ -1,0 +1,17 @@
+[Unit]
+Description=Node
+After=docker.service statsd.service
+Requires=docker.service statsd.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker kill node
+ExecStartPre=-/usr/bin/docker rm -v node
+ExecStartPre=/usr/bin/docker pull screepers/screeps-statsd
+ExecStart=/usr/bin/docker run \
+    --name node \
+    -e "GRAPHITE_PORT_8125_UDP_ADDR=statsd" \
+    --env-file /home/ubuntu/screeps/node.env \
+    --link statsd \
+    screepers/screeps-statsd
+ExecStop=/usr/bin/docker stop node
